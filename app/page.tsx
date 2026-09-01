@@ -1,69 +1,192 @@
-import Image from "next/image";
+// app/page.tsx
 
-export default function Home() {
+import { getForecast, getAllocation } from "@/app/lib/api/api";
+import StatCard from "@/components/ui/StatCard";
+import PriceChartClient from "@/components/PriceChartClient";
+
+export default async function Dashboard() {
+  const forecast = await getForecast("Maize (white)", "Ibadan");
+  const allocation = await getAllocation();
+
+  const currentPrice = forecast.history.at(-1)?.price || 0;
+  const priceChange = forecast.forecasted_price - currentPrice;
+  const priceChangePercent = ((priceChange / currentPrice) * 100).toFixed(1);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="flex-1 min-h-screen bg-parchment">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 text-parchment  shadow-lg">
+        <div className="p-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h1 className="font-serif text-4xl font-bold text-parchment mb-2">
+                  Dashboard
+                </h1>
+                <p className="text-parchment/80 text-lg">
+                  Real-time agricultural price forecasting and optimization
+                </p>
+              </div>
+              <div className="text-right text-parchment/70">
+                <p className="text-sm uppercase tracking-widest font-medium">Current Focus</p>
+                <p className="font-serif text-2xl font-bold text-accent">{forecast.commodity}</p>
+                <p className="text-sm">{forecast.market}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="p-8 max-w-6xl mx-auto">
+        {/* Key Metrics Section */}
+        <section className="mb-8">
+          <h2 className="font-serif text-2xl font-bold text-navy mb-6">Key Metrics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatCard
+              label="Current Price"
+              value={`₦${currentPrice.toLocaleString()}`}
+            />
+            <StatCard
+              label="Next Month Forecast"
+              value={`₦${forecast.forecasted_price.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+              sublabel={`${priceChange >= 0 ? '↑' : '↓'} ${Math.abs(priceChangePercent)}% (₦${Math.abs(priceChange).toFixed(0)})`}
+            />
+            <StatCard
+              label="Model Accuracy"
+              value={`${(forecast.metrics.arima_r2 * 100).toFixed(1)}%`}
+              sublabel={`MAPE: ${forecast.metrics.arima_mape}%`}
+            />
+          </div>
+        </section>
+
+        {/* Price Analysis Section */}
+        <section className="mb-8">
+          <div className="bg-gray-100  rounded-lg shadow-classic overflow-hidden">
+            <div className="bg-white/60  p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-serif text-2xl font-bold text-green-800 mb-1">
+                    Price Trend Analysis
+                  </h2>
+                  <p className="text-muted text-sm">
+                    {forecast.commodity} price history and 12-month forecast using ARIMA model
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs uppercase tracking-widest text-muted font-medium mb-1">
+                    Forecast Period
+                  </div>
+                  <div className="text-lg font-semibold text-green-800">Next 12 Months</div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <PriceChartClient data={forecast.history} title="Price History & Forecast" />
+            </div>
+          </div>
+        </section>
+
+        {/* Optimization Section */}
+        <section>
+          <div className="bg-gray-100  rounded-lg shadow-classic overflow-hidden">
+            <div className="bg-gradient-to-r from-accent/10 to-accent/5  p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-serif text-2xl font-bold text-green-800 mb-2">
+                    Optimized Supply Allocation
+                  </h2>
+                  <p className="text-muted text-sm">
+                    Linear programming optimization for maximum net value across markets
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs uppercase tracking-widest text-muted font-medium mb-1">
+                    Total Net Value
+                  </div>
+                  <div className="text-3xl font-bold text-accent">
+                    ₦{allocation.total_net_value.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Allocation Grid */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {Object.entries(allocation.allocation).map(([market, units]) => {
+                  const netValue = allocation.net_value_per_unit[market] || 0;
+                  return (
+                    <div
+                      key={market}
+                      className="bg-white  rounded-lg p-5 hover:shadow-md  transition-all duration-200"
+                    >
+                      <div className="text-xs uppercase tracking-widest text-muted font-semibold mb-3 block">
+                        {market}
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-muted mb-1">Allocation</p>
+                          <p className="font-serif text-2xl font-bold text-green-800">
+                            {units} <span className="text-xs text-muted font-normal">units</span>
+                          </p>
+                        </div>
+                        <div className="pt-3 border-t border-border/40">
+                          <p className="text-xs text-muted mb-1">Net Value/Unit</p>
+                          <p className="font-semibold text-accent">
+                            ₦{netValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Summary Stats */}
+              <div className="mt-8 pt-6 border-t border-border/40">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-muted font-medium mb-2">
+                      Total Units
+                    </p>
+                    <p className="font-serif text-3xl font-bold text-navy">
+                      {Object.values(allocation.allocation).reduce((sum, val) => sum + val, 0)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-muted font-medium mb-2">
+                      Markets Covered
+                    </p>
+                    <p className="font-serif text-3xl font-bold text-navy">
+                      {Object.keys(allocation.allocation).length}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-muted font-medium mb-2">
+                      Avg. Net Value
+                    </p>
+                    <p className="font-serif text-3xl font-bold text-accent">
+                      ₦{(
+                        allocation.total_net_value /
+                        Object.values(allocation.allocation).reduce((sum, val) => sum + val, 0)
+                      ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer Info */}
+        <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted">
+          <p>All forecasts are based on walk-forward validation using ARIMA models</p>
+          <p className="mt-2">
+            Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
