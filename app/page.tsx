@@ -45,16 +45,16 @@ export default async function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
               label="Current Price"
-              value={`₦${currentPrice.toLocaleString()}`}
+              value={<span className="font-sans">₦{currentPrice.toLocaleString()}</span>}
             />
             <StatCard
               label="Next Month Forecast"
-              value={`₦${forecast.forecasted_price.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-              sublabel={`${priceChange >= 0 ? '↑' : '↓'} ${Math.abs(priceChangePercent)}% (₦${Math.abs(priceChange).toFixed(0)})`}
+              value={<span className="font-sans">₦{forecast.forecasted_price.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>}
+              sublabel={<span>{priceChange >= 0 ? '↑' : '↓'} {Math.abs(priceChangePercent)}% (<span className="font-sans">₦{Math.abs(priceChange).toFixed(0)}</span>)</span>}
             />
             <StatCard
-              label="Model Accuracy"
-              value={`${(forecast.metrics.arima_r2 * 100).toFixed(1)}%`}
+              label="R² (walk-forward)"
+              value={forecast.metrics.arima_r2}
               sublabel={`MAPE: ${forecast.metrics.arima_mape}%`}
             />
           </div>
@@ -105,7 +105,7 @@ export default async function Dashboard() {
                     Total Net Value
                   </div>
                   <div className="text-3xl font-bold text-accent">
-                    ₦{allocation.total_net_value.toLocaleString()}
+                    <span className="font-sans">₦{allocation.total_net_value.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -134,7 +134,7 @@ export default async function Dashboard() {
                         <div className="pt-3 border-t border-border/40">
                           <p className="text-xs text-muted mb-1">Net Value/Unit</p>
                           <p className="font-semibold text-accent">
-                            ₦{netValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            <span className="font-sans">₦{netValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                           </p>
                         </div>
                       </div>
@@ -167,10 +167,10 @@ export default async function Dashboard() {
                       Avg. Net Value
                     </p>
                     <p className="font-serif text-3xl font-bold text-accent">
-                      ₦{(
+                      <span className="font-sans">₦{(
                         allocation.total_net_value /
                         Object.values(allocation.allocation).reduce((sum, val) => sum + val, 0)
-                      ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      ).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     </p>
                   </div>
                 </div>

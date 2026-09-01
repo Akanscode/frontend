@@ -37,7 +37,7 @@ export default async function AllocationPage() {
                 Total Net Value
               </p>
               <p className="font-serif text-4xl font-bold text-navy leading-tight">
-                ₦{allocation.total_net_value.toLocaleString()}
+                <span className="font-sans">₦{allocation.total_net_value.toLocaleString()}</span>
               </p>
               <div className="mt-4 pt-4 border-t border-border/40" />
             </div>
@@ -57,7 +57,7 @@ export default async function AllocationPage() {
                 Avg Net Value/Unit
               </p>
               <p className="font-serif text-4xl font-bold text-accent leading-tight">
-                ₦{avgNetValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                <span className="font-sans">₦{avgNetValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </p>
               <div className="mt-4 pt-4 border-t border-border/40" />
             </div>
@@ -99,13 +99,13 @@ export default async function AllocationPage() {
                         <div className="pt-4 border-t border-border/40">
                           <p className="text-xs text-muted mb-1">Net Value/Unit</p>
                           <p className="font-semibold text-accent text-lg">
-                            ₦{netValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            <span className="font-sans">₦{netValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                           </p>
                         </div>
                         <div className="pt-2 border-t border-border/40">
                           <p className="text-xs text-muted mb-1">Total Market Value</p>
                           <p className="font-semibold text-navy">
-                            ₦{totalMarketValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            <span className="font-sans">₦{totalMarketValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                           </p>
                         </div>
                       </div>
