@@ -30,8 +30,9 @@ export async function getForecast(commodity: string, market: string): Promise<Fo
     if (!res.ok) throw new Error(`Forecast request failed: ${res.status} ${res.statusText}`);
     return res.json();
   } catch (err) {
-    // If backend is unreachable during local development, return a sensible stub
-    if (process.env.NODE_ENV === "development") {
+    // If backend is unreachable during local development or no API URL is configured,
+    // return a sensible stub so the frontend can build/prerender without the backend.
+    if (process.env.NODE_ENV === "development" || !process.env.NEXT_PUBLIC_API_URL || API_BASE.includes("localhost")) {
       console.warn("getForecast: backend unreachable, returning development stub:", err);
       return {
         commodity,
@@ -60,7 +61,7 @@ export async function getAllocation(): Promise<AllocationResponse> {
     if (!res.ok) throw new Error(`Allocation request failed: ${res.status} ${res.statusText}`);
     return res.json();
   } catch (err) {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" || !process.env.NEXT_PUBLIC_API_URL || API_BASE.includes("localhost")) {
       console.warn("getAllocation: backend unreachable, returning development stub:", err);
       return {
         allocation: { Ibadan: 40, Lagos: 35, Dawanau: 25 },

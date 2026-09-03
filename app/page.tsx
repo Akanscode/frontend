@@ -50,7 +50,7 @@ export default async function Dashboard() {
             <StatCard
               label="Next Month Forecast"
               value={<span className="font-sans">₦{forecast.forecasted_price.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>}
-              sublabel={<span>{priceChange >= 0 ? '↑' : '↓'} {Math.abs(priceChangePercent)}% (<span className="font-sans">₦{Math.abs(priceChange).toFixed(0)}</span>)</span>}
+              sublabel={<span>{priceChange >= 0 ? '↑' : '↓'} {Math.abs(Number(priceChangePercent))}% (<span className="font-sans">₦{Math.abs(priceChange).toFixed(0)}</span>)</span>}
             />
             <StatCard
               label="R² (walk-forward)"
